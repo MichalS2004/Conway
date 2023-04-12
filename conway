@@ -1,0 +1,66 @@
+Using Plots
+
+licznik = 0
+roznica_x = 0
+roznica_y = 0
+
+function sasiedzi(wspx, wspy, n)
+    wsp1 = zeros(Int64, 8)
+    wsp2 = zeros(Int64, 8)
+    pom = 1
+    for i in 1:n
+        for j in 1:n
+            roznica_x = abs(wspx-i)
+            roznica_y = abs(wspy-j)
+            if roznica_x == n-1
+                roznica_x = 1
+            end
+            if roznica_y == n-1
+                roznica_y = 1
+            end
+            if (roznica_x <=1 && roznica_y == 1) || (roznica_x == 1 && roznica_y <= 1)
+                wsp1[pom] = i
+                wsp2[pom] = j
+                pom = pom + 1
+            end
+        end
+    end
+    return wsp1, wsp2
+end
+
+wsp1, wsp2 = sasiedzi(1, 1, 8)
+print(wsp2[1])
+
+
+torus = rand((0:1), 8, 8)
+
+ 
+ani=Animation()
+for p in 1:10 
+    heatmap(torus, color=:coolwarm, cbar=false, title="Iteration $p", xlims=(0, 8), ylims=(0, 8), ticks=false, grid=false)
+    scatter!([(i,j) for i=1:8, j=1:8 if torus[i,j]==1], color=:red, markersize=8)
+    frame(ani)
+    for i in 1:8
+        for j in 1:8
+            wsp1, wsp2 = sasiedzi(i, j, 8)
+            for g in 1:8
+                if torus[wsp1[g], wsp2[g]] == 1
+                    licznik = licznik + 1
+                end
+            end
+            if torus[i, j] == 1
+                if licznik != 2 && licznik != 3
+                    torus[i, j] = 0
+                end
+            end
+            if torus[i, j] == 0
+                if licznik == 3
+                    torus[i, j] = 1
+                end
+            end
+            licznik = 0
+        end
+    end
+end
+
+
