@@ -1,8 +1,4 @@
-Using Plots
-
-licznik = 0
-roznica_x = 0
-roznica_y = 0
+using Plots
 
 function sasiedzi(wspx, wspy, n)
     wsp1 = zeros(Int64, 8)
@@ -28,39 +24,33 @@ function sasiedzi(wspx, wspy, n)
     return wsp1, wsp2
 end
 
-wsp1, wsp2 = sasiedzi(1, 1, 8)
-print(wsp2[1])
-
-
 torus = rand((0:1), 8, 8)
 
- 
-ani=Animation()
-for p in 1:10 
-    heatmap(torus, color=:coolwarm, cbar=false, title="Iteration $p", xlims=(0, 8), ylims=(0, 8), ticks=false, grid=false)
-    scatter!([(i,j) for i=1:8, j=1:8 if torus[i,j]==1], color=:red, markersize=8)
-    frame(ani)
+anim = @animate for p in 1:10
+    heatmap(torus,
+        aspect_ratio = 1,
+        seriescolor = palette([:green,:white])
+                )
     for i in 1:8
         for j in 1:8
             wsp1, wsp2 = sasiedzi(i, j, 8)
+            licznik = 0  # initialize licznik to 0
             for g in 1:8
                 if torus[wsp1[g], wsp2[g]] == 1
-                    licznik = licznik + 1
+                    licznik = licznik + 1  # increment only if the value is 1
                 end
             end
             if torus[i, j] == 1
                 if licznik != 2 && licznik != 3
                     torus[i, j] = 0
                 end
-            end
-            if torus[i, j] == 0
+            else
                 if licznik == 3
                     torus[i, j] = 1
                 end
             end
-            licznik = 0
         end
     end
 end
 
-
+gif(anim, "mojaAnimacja.gif", fps = 1)
